@@ -6,9 +6,11 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(tidytuesdayR)
+library(ThemePark)
 ```
 
 # Fun with functions
+Janis Prak
 
 ## Part 1A: Exponential transformation
 
@@ -166,13 +168,21 @@ p %>%
       values = c("hotpink", "purple"),           # Custom colors
     labels = c("Maximum temperature", "Minimum temperature") 
   )+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_starwars()+
+  theme(axis.text = element_text(size = 10, angle = 45, hjust = 1),
+        plot.title = element_text(size = 15),
+        panel.grid.major = element_line(color = "gray30", linewidth = 0.5),
+        panel.grid.minor = element_line(color = "gray20", linewidth = 0.25)
+        )
 ```
 
 ## Part 3B: Plotting rainfall over time
 
 I began with the error messages if the inputted data doesn't exist in the data to stop any errors. Then, I filtered the data by city and year, and then plotted the graph. Lastly, I added aesthetic choices to make the graph more reader friendly.
 ```{r}
+#remotes::install_github("MatthewBJane/ThemePark")
+
+
 rainplot <- function(cty, yr) {
   if (!cty %in% raintemp$city_name){
     stop("City does not exist in dataset.")
@@ -190,10 +200,56 @@ rainplot <- function(cty, yr) {
       x = "Log(Rainfall (mm))",
       y = "Frequency",
       caption = "SOURCE = #tidytuesday project"
-    )  
+    ) +
+    theme_barbie()+
+    theme(
+      panel.grid.major = element_line(color = "lightblue", linewidth = 0.5),
+      panel.grid.minor = element_line(color = "lightblue", linewidth = 0.25)
+    )
   
     
 }
 
 rainplot(cty = "SYDNEY", yr = 2017)
+```
+
+# Part 4: Apply functions and plot
+
+## Part 4A: Tasks
+
+```{r}
+rain_df <- raintemp%>%
+  filter(year >= 2014)%>%
+  group_by(year, city_name)%>%
+  summarize(
+    average = sample_mean(rainfall),
+    stddev = sample_sd(rainfall),
+    lower_bound = calculate_CI(rainfall,0.95)[1],
+    upper_bound = calculate_CI(rainfall,0.95)[2]
+  )
+rain_df
+```
+
+## Part 4B: Tasks
+
+```{r}
+rain_df%>%
+  ggplot(aes(x = year, y = average, color = city_name))+
+  geom_point()+
+  geom_line(linewidth = .75)+
+  geom_errorbar(aes(ymin = lower_bound, ymax = upper_bound), width = 0.2)+
+  labs(
+    title = ("Average rainfall in each city overtime"),
+    subtitle = "Average rainfall in each year has decreased since 2014 in most of these cities.",
+    x = "Year",
+    y = "Average Rainfall (mm)",
+    color = "City",
+    caption = "SOURCE: #tidytuesday project"
+  )+
+  theme_gameofthrones()+
+  theme(
+    legend.text = element_text(color = "brown"), 
+    legend.title = element_text(color = "brown", face = "bold"),
+    plot.title = element_text(size = 20)
+  )
 ```
