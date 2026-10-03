@@ -131,13 +131,69 @@ rainfall <- rainfall %>%
          city_name = toupper(city_name))%>%
   select(!c(month,day))
 
-inner_join(rainfall, temperature, by = c("city_name", "date"))
+raintemp <- inner_join(rainfall, temperature, by = c("city_name", "date"))
 
-
+raintemp
 
 ```
 
+# Part 3: Data visualization
 
+## Part 3A: Plotting temperature data over time
 
+```{r}
+p <- raintemp %>%
+  filter(year >= 2014)%>%
+  group_by(city_name,year)%>%
+  summarize(
+    maxtemp = max(temperature),
+    mintemp = min(temperature)
+  )
+p %>%
+  ggplot(aes(x = year))+
+  geom_line(aes(y = maxtemp, color = "maxtemp"))+
+  geom_line(aes(y = mintemp, color = "mintemp"))+
+  facet_wrap(~ city_name, nrow = 2, axes = "all")+
+  labs(
+    title = "Maximum and Minimum Temperature in Each City per Year",
+    subtitle = "Maximum and minimum temperatures remain steady through the years.",
+    x = "Year",
+    y = "Temperature(˚C)",
+    color = "",
+    caption = "SOURCE: #tidytuesday project"
+  )+
+  scale_color_manual(
+      values = c("hotpink", "purple"),           # Custom colors
+    labels = c("Maximum temperature", "Minimum temperature") 
+  )+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
+## Part 3B: Plotting rainfall over time
 
+I began with the error messages if the inputted data doesn't exist in the data to stop any errors. Then, I filtered the data by city and year, and then plotted the graph. Lastly, I added aesthetic choices to make the graph more reader friendly.
+```{r}
+rainplot <- function(cty, yr) {
+  if (!cty %in% raintemp$city_name){
+    stop("City does not exist in dataset.")
+  }
+  if (!yr %in% raintemp$year){
+    stop("Year does not exist in the dataset.")
+  }
+  raintemp%>%
+    filter(city_name == cty, year == yr)%>%
+    ggplot(aes(log(rainfall)))+
+    geom_histogram(bins = 30)+
+    labs(
+      title = paste0("Distribution of Rainfall in ",yr),
+      subtitle = paste0("City: ", cty),
+      x = "Log(Rainfall (mm))",
+      y = "Frequency",
+      caption = "SOURCE = #tidytuesday project"
+    )  
+  
+    
+}
+
+rainplot(cty = "SYDNEY", yr = 2017)
+```
