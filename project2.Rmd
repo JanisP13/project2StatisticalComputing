@@ -1,0 +1,67 @@
+---
+title: "project2"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(tidytuesdayR)
+```
+
+# Fun with functions
+
+## Part 1A: Exponential transformation
+
+Write a function that computes the exponential of a number using the truncated series expansion. The function should take two arguments:
+
+x: the number to be exponentiated
+
+k: the number of terms to be used in the series expansion beyond the constant 1. The value of k is always  ≥1.
+
+For example, if 𝑘 =1, then the Exp function should return the number 1 +𝑥. If 𝑘 =2, then you should return the number 1 +𝑥 +𝑥2/2!.
+
+Include at least one example of output using your function.
+```{r}
+Exp <- function(x, k) {
+  ex <- 1
+  for (i in 1:k){
+    ex <- ex + ((x^i)/factorial(i))
+  }
+  return(ex)
+}
+```
+
+```{r}
+Exp(2,567)
+```
+
+## Part 1B: Sample mean and sample standard deviation
+
+Next, write two functions called sample_mean() and sample_sd() that takes as input a vector of data of length 𝑁 and calculates the sample average and sample standard deviation for the set of 𝑁 observations.
+
+Include at least one example of output using your functions.
+
+```{r}
+myvector <- c(4,5,67,1,3,4,5)
+sample_mean <- function(x) {
+    add <- 0
+    for (i in x) {
+      add <- add + i
+    }
+    return(add/length(x))
+}
+
+sample_mean(myvector)
+```
+
+```{r}
+sample_sd <- function(x) {
+    add <- 0
+    for (i in x){
+      add <- add + ((i-sample_mean(x))^2)
+    }
+    return(sqrt((1/(length(x)-1))*add))
+}
+
+sample_sd(myvector)
+```
