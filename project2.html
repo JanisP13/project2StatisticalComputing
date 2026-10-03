@@ -415,6 +415,41 @@ sample_mean(myvector)</code></pre>
 sample_sd(myvector)</code></pre>
 <pre><code>## [1] 23.97717</code></pre>
 </div>
+<div id="part-1c-confidence-intervals" class="section level2">
+<h2>Part 1C: Confidence intervals</h2>
+<pre class="r"><code>calculate_CI &lt;- function(x, conf) {
+    alpha &lt;- 1 - conf
+    degrees_freedom &lt;- length(x) - 1
+    t_score &lt;- qt(p = alpha / 2, df = degrees_freedom, lower.tail = FALSE)
+    
+    lower_bound &lt;- sample_mean(x)-(t_score*sample_sd(x)/sqrt(length(x)))
+    upper_bound &lt;- sample_mean(x)+(t_score*sample_sd(x)/sqrt(length(x)))
+    ci&lt;- c(lower_bound,upper_bound)
+    
+    return(ci)
+}
+
+calculate_CI(myvector, 0.95)</code></pre>
+<pre><code>## [1] -9.46090 34.88947</code></pre>
+<pre class="r"><code>calculate_CI(myvector, 0.82)</code></pre>
+<pre><code>## [1] -1.035687 26.464258</code></pre>
+<pre class="r"><code>#test
+dat &lt;- data.frame(x = myvector)
+fit &lt;- lm(myvector ~ 1, dat)
+
+# Calculate a 95% confidence interval
+confint(fit, level = 0.95)</code></pre>
+<pre><code>##               2.5 %   97.5 %
+## (Intercept) -9.4609 34.88947</code></pre>
+<pre class="r"><code>#test #2
+dat &lt;- data.frame(x = myvector)
+fit &lt;- lm(myvector ~ 1, dat)
+
+# Calculate a 95% confidence interval
+confint(fit, level = 0.82)</code></pre>
+<pre><code>##                   9 %     91 %
+## (Intercept) -1.035687 26.46426</code></pre>
+</div>
 </div>
 
 

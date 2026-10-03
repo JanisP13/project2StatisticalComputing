@@ -65,3 +65,47 @@ sample_sd <- function(x) {
 
 sample_sd(myvector)
 ```
+
+## Part 1C: Confidence intervals
+
+```{r}
+calculate_CI <- function(x, conf) {
+    alpha <- 1 - conf
+    degrees_freedom <- length(x) - 1
+    t_score <- qt(p = alpha / 2, df = degrees_freedom, lower.tail = FALSE)
+    
+    lower_bound <- sample_mean(x)-(t_score*sample_sd(x)/sqrt(length(x)))
+    upper_bound <- sample_mean(x)+(t_score*sample_sd(x)/sqrt(length(x)))
+    ci<- c(lower_bound,upper_bound)
+    
+    return(ci)
+}
+
+calculate_CI(myvector, 0.95)
+calculate_CI(myvector, 0.82)
+```
+
+```{r} 
+#test
+dat <- data.frame(x = myvector)
+fit <- lm(myvector ~ 1, dat)
+
+# Calculate a 95% confidence interval
+confint(fit, level = 0.95)
+
+#test #2
+dat <- data.frame(x = myvector)
+fit <- lm(myvector ~ 1, dat)
+
+# Calculate a 95% confidence interval
+confint(fit, level = 0.82)
+```
+
+
+
+
+
+
+
+
+
