@@ -101,9 +101,41 @@ fit <- lm(myvector ~ 1, dat)
 confint(fit, level = 0.82)
 ```
 
+# Part 2: Wrangling data
+
+
+```{r}
+library(here)
+if (!file.exists(here("data", "tuesdata_rainfall.RDS"))) {
+    tuesdata <- tidytuesdayR::tt_load("2020-01-07")
+    rainfall <- tuesdata$rainfall
+    temperature <- tuesdata$temperature
+
+    # save the files to RDS objects
+    saveRDS(tuesdata$rainfall, file = here("data", "tuesdata_rainfall.RDS"))
+    saveRDS(tuesdata$temperature, file = here("data", "tuesdata_temperature.RDS"))
+}
+```
+
+```{r}
+rainfall <- readRDS(here("data", "tuesdata_rainfall.RDS"))
+temperature <- readRDS(here("data", "tuesdata_temperature.RDS"))
+
+glimpse(rainfall)
+glimpse(temperature)
+```
+```{r}
+rainfall <- rainfall %>%
+  drop_na()%>%
+  mutate(date = ymd(paste0(year,"-",month,"-",day)),
+         city_name = toupper(city_name))%>%
+  select(!c(month,day))
+
+inner_join(rainfall, temperature, by = c("city_name", "date"))
 
 
 
+```
 
 
 
